@@ -5,13 +5,12 @@ import random
 import math
 
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
 
 # Global Variables
 GRID_SIZE = tuple(int(dimension) for dimension in sys.argv[1].split(','))       # GRID_SIZE = ( dim1, dim2, ..., dimn) <tuple of ints.
 NUM_FOOD = int(sys.argv[2])                                                     # NUM_FOOD <integer>
-FOODAREA_GRIDAREA_RATIO = 1/3
-VARIANCE_THRESHOLD = 0.25
+FOODAREA_GRIDAREA_RATIO = 1/5
+VARIANCE_THRESHOLD = 0.05
 
 # ASSUMES 2D GRID
 def display_grid(grid):
@@ -35,28 +34,29 @@ center of the food source in order to meet the foodArea_gridArea_ratio given the
 
 def calculate_variance(grid_area, food_grid_ratio, num_food): return round((math.sqrt(grid_area*food_grid_ratio // num_food)-1) // 2)
 
-def calculate_sigma(variance, z_val): return math.sqrt(variance**2 / -2*math.log(z_val))
+def calculate_sigma(variance, z_val): return math.sqrt(variance**2 / (-2*math.log(z_val)))
 
 def probability_func(x_vals, y_vals, center_x, center_y, sigma): return np.exp(-1/(2*sigma**2) * ((x_vals-center_x)**2+(y_vals-center_y)**2))
 
-def create_food(grid, center_x, center_y, variance, sigma):
-    print(center_x)
-    print(center_y)
-
-    food_x_axis = np.arange(center_x - variance, center_x + variance+1, 1)
-    food_y_axis = np.arange(center_y - variance, center_y + variance+1, 1) 
-    x_vals, y_vals = np.meshgrid(food_x_axis, food_y_axis)
-
+def display_probability_func(x_vals, y_vals, center_x, center_y, sigma):
     probabilities = probability_func(x_vals, y_vals, center_x, center_y, sigma)
-    print(x_vals)
-    print(y_vals)
-    print(probabilities)
-    input()
 
     ax = plt.axes(projection="3d")
     ax.scatter(x_vals, y_vals, probabilities, marker='^')
     ax.scatter(x_vals, y_vals, 0.25)
     plt.show()
+
+def create_food(grid, grid_width, grid_height, center_x, center_y, variance, sigma):
+    food_x_axis = np.arange(np.clip(center_x - variance, 0, grid_width), np.clip(center_x + variance + 1, 0, grid_width), 1)
+    food_y_axis = np.arange(np.clip(center_y - variance, 0, grid_height), np.clip(center_y + variance + 1, 0, grid_height), 1)
+    x_vals, y_vals = np.meshgrid(food_x_axis, food_y_axis)
+
+    probabilities = probability_func(x_vals, y_vals, center_x, center_y, sigma)
+
+    for row in range(probabilities.shape[0]):
+        for col in range(probabilities.shape[1]):
+            xval, yval = x_vals[row][col], y_vals[row][col]
+            if(random.uniform(0,1) <= probabilities[row][col]): grid[xval][yval] = 1
 
 def create_grid(grid_size, num_food, food_grid_ratio, variance_threshold):
     width, height = grid_size
@@ -66,10 +66,10 @@ def create_grid(grid_size, num_food, food_grid_ratio, variance_threshold):
     sigma = calculate_sigma(variance, variance_threshold)
 
     for x,y in food_coords: 
-        create_food(grid, x, y, variance, sigma)
-        input()
+        create_food(grid, width, height, x, y, variance, sigma)
+        plt.imshow(grid)
+        plt.show()
 
     return grid
 
 grid = create_grid(GRID_SIZE, NUM_FOOD, FOODAREA_GRIDAREA_RATIO, VARIANCE_THRESHOLD)
-#displ
