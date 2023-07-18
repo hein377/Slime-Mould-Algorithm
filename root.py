@@ -26,21 +26,7 @@ class Root:
         verbose : bool, optional
         """
         
-        self.obj_func = obj_func
-        self.lb = lb
-        self.ub = ub
-        self.problem_size = problem_size
-        self.verbose = verbose
-
-        try:
-            self.lb = lb * ones(problem_size)
-            self.ub = ub * ones(problem_size)
-        except:
-            - lb, ub must be integers
-            - problem_size must be tuple of integers
-            
-           
-
+        self.obj_func = obj_func  
 
         if (lb is None) or (ub is None):
             if problem_size is None:
