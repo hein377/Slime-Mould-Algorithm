@@ -26,41 +26,18 @@ class Root:
         verbose : bool, optional
         """
         
-        self.obj_func = obj_func  
-
-        if (lb is None) or (ub is None):
-            if problem_size is None:
-                print("Problem size must be an int number")
-                exit(0)
-            elif problem_size <= 0:
-                print("Problem size must > 0")
-                exit(0)
-            else:
-                self.problem_size = int(ceil(problem_size))
-                self.lb = -1 * ones(problem_size)
-                self.ub = 1 * ones(problem_size)
-        else:
-            if isinstance(lb, list) and isinstance(ub, list) and not (problem_size is None):
-                if (len(lb) == len(ub)) and (problem_size > 0):
-                    if len(lb) == 1:
-                        self.problem_size = problem_size
-                        self.lb = lb[0] * ones(problem_size)
-                        self.ub = ub[0] * ones(problem_size)
-                    else:
-                        self.problem_size = len(lb)
-                        self.lb = array(lb)
-                        self.ub = array(ub)
-                else:
-                    print("Lower bound and Upper bound need to be same length. Problem size must > 0")
-                    exit(0)
-            else:
-                print("Lower bound and Upper bound need to be a list. Problem size is an int number")
-                exit(0)
+        self.obj_func = obj_func
+        self.problem_size = problem_size
         self.verbose = verbose
-        self.epoch, self.pop_size = None, None
-        self.solution, self.loss_train = None, []
 
-    def create_solution(self, minmax=0):
+        try:
+            self.lb = lb * ones(problem_size)
+            self.ub = ub * ones(problem_size)
+        except (TypeError, ValueError) as e:                        # lb, ub must be integers and problem_size must be a tuple of integers
+            print(str(e))
+            exit(0)
+
+    def create_agent(self, minmax=0):
         """ Return the position position with 2 element: position of position and fitness of position
         Parameters
         ----------

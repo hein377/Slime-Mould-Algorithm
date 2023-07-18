@@ -13,21 +13,25 @@ class BaseSMA(Root):
 
     ID_WEI = 2
 
-    def __init__(self, obj_func=None, lb=None, ub=None, problem_size=50, verbose=True, epoch=750, pop_size=100, z=0.03):
+    def __init__(self, obj_func=None, lb=None, ub=None, problem_size=(1,2), verbose=False, epoch=75, pop_size=100, z=0.03):
         Root.__init__(self, obj_func, lb, ub, problem_size, verbose)
         self.epoch = epoch
         self.pop_size = pop_size
         self.z = z
 
-    def create_solution(self, minmax=0):
+        self.solution = None
+
+    def create_agent(self, minmax=0):
         pos = uniform(self.lb, self.ub)
         fit = self.get_fitness_position(pos)
         weight = zeros(self.problem_size)
         return [pos, fit, weight]
 
     def train(self):
-        pop = [self.create_solution() for _ in range(self.pop_size)]
+        pop = [self.create_agent() for _ in range(self.pop_size)]
         pop, g_best = self.get_sorted_pop_and_global_best_solution(pop, self.ID_FIT, self.ID_MIN_PROB)      # Eq.(2.6)
+        print(g_best)
+        input()
 
         for epoch in range(self.epoch):
 
@@ -71,5 +75,6 @@ class BaseSMA(Root):
             self.loss_train.append(g_best[self.ID_FIT])
             if self.verbose:
                 print("> Epoch: {}, Best fit: {}".format(epoch + 1, g_best[self.ID_FIT]))
+
         self.solution = g_best
         return g_best[self.ID_POS], g_best[self.ID_FIT], self.loss_train
