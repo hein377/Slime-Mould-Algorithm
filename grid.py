@@ -41,13 +41,13 @@ class Grid:
 
     def probability_func(self, x_vals, y_vals, center_x, center_y): return np.exp(-1/(2*self.sigma**2) * ((x_vals-center_x)**2+(y_vals-center_y)**2))
 
-    def create_square_mesh_grid(self, grid_width, grid_height, center_x, center_y):
-        food_x_axis = np.arange(np.clip(center_x - self.variance, 0, grid_width), np.clip(center_x + self.variance + 1, 0, grid_width), 1)
-        food_y_axis = np.arange(np.clip(center_y - self.variance, 0, grid_height), np.clip(center_y + self.variance + 1, 0, grid_height), 1)
+    def create_square_mesh_grid(self, xLeftPoint, xRightPoint, xLeftBoundary, xRightBoundary, yLeftPoint, yRightPoint, yLeftBoundary, yRightBoundary):
+        food_x_axis = np.arange(np.clip(xLeftPoint, xLeftBoundary, xRightBoundary), np.clip(xRightPoint, xLeftBoundary, xRightBoundary), 1)
+        food_y_axis = np.arange(np.clip(yLeftPoint, yLeftBoundary, yRightBoundary), np.clip(yRightPoint, yLeftBoundary, yRightBoundary), 1)
         return np.meshgrid(food_x_axis, food_y_axis)
 
     def add_food_source(self, grid_width, grid_height, center_x, center_y):
-        x_vals, y_vals = self.create_square_mesh_grid(grid_width, grid_height, center_x, center_y)
+        x_vals, y_vals = self.create_square_mesh_grid(center_x-self.variance, center_x+self.variance+1, 0, grid_width, center_y-self.variance, center_y+self.variance+1, 0, grid_height)
         #display_probability_func(x_vals, y_vals, center_x, center_y, sigma)
         probabilities = self.probability_func(x_vals, y_vals, center_x, center_y)
 
