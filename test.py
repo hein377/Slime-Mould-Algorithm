@@ -28,8 +28,6 @@ ax.plot_surface(X, Y, Z, rstride=1, cstride=1, cmap='viridis', edgecolor='none')
 plt.show()
 '''
 
-import numpy as np
-clipped = np.clip(301, 0, 299)
-
-food_x_axis = np.arange(np.clip(-30, 0, 200), np.clip(250, 0, 200), 1)
-print(food_x_axis)
+from grid import Grid
+my_grid = Grid()
+my_grid.display_grid()
