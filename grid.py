@@ -41,13 +41,14 @@ class Grid:
 
     def probability_func(self, x_vals, y_vals, center_x, center_y): return np.exp(-1/(2*self.sigma**2) * ((x_vals-center_x)**2+(y_vals-center_y)**2))
 
-    def create_food(self, grid_width, grid_height, center_x, center_y):
+    def create_square_mesh_grid(self, grid_width, grid_height, center_x, center_y):
         food_x_axis = np.arange(np.clip(center_x - self.variance, 0, grid_width), np.clip(center_x + self.variance + 1, 0, grid_width), 1)
         food_y_axis = np.arange(np.clip(center_y - self.variance, 0, grid_height), np.clip(center_y + self.variance + 1, 0, grid_height), 1)
-        x_vals, y_vals = np.meshgrid(food_x_axis, food_y_axis)
+        return np.meshgrid(food_x_axis, food_y_axis)
 
+    def add_food_source(self, grid_width, grid_height, center_x, center_y):
+        x_vals, y_vals = self.create_square_mesh_grid(grid_width, grid_height, center_x, center_y)
         #display_probability_func(x_vals, y_vals, center_x, center_y, sigma)
-
         probabilities = self.probability_func(x_vals, y_vals, center_x, center_y)
 
         for row in range(probabilities.shape[0]):
@@ -58,11 +59,13 @@ class Grid:
     def create_grid(self):
         width, height = self.grid_size
         self.grid = np.zeros(self.grid_size)
+
+        # Add food to the empty grid
         food_coords_centers = list(zip(random.sample(range(width), self.num_food), random.sample(range(height), self.num_food)))
         self.variance = self.calculate_variance(width*height)
         self.sigma = self.calculate_sigma()
 
-        for center_x, center_y in food_coords_centers: self.create_food(width, height, center_x, center_y)
+        for center_x, center_y in food_coords_centers: self.add_food_source(width, height, center_x, center_y)
 
     def __init__(self, grid_size=(500,500), num_food=10, foodArea_gridArea_ratio=1/5, variance_threshold=0.03):
         self.grid_size = grid_size
